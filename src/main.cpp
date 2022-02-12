@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#include <Adafruit_GFX.h>    // Core graphics library
-#include <Adafruit_ST7735.h> // Hardware-specific library
+#include <GFXcanvas16Opt.h>   // canvas layer
+#include <Adafruit_ST7735.h>  // gpu driver
 #include <SPI.h>
 #include "sprites.h"
 
@@ -15,8 +15,10 @@
 #define JOY_B1 6
 #define JOY_B2 7
 
+#define MAGENTA 0xF81F
+
 Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
-GFXcanvas16 *canvas = new GFXcanvas16(128, 128);
+GFXcanvas16Opt *canvas = new GFXcanvas16Opt(128, 128);
 
 uint lastMillis;
 float x, y, fps, aX, aY, gravity;
@@ -121,7 +123,7 @@ void loop(void)
 
   actions();
 
-  canvas->drawRGBBitmap(x, y, sprite, 16, 16);
+  canvas->drawRGBBitmap(x, y, sprite, 16, 16, MAGENTA);
 
   getFps();
 
