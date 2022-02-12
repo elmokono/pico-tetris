@@ -2,14 +2,14 @@
 
 GFXcanvas16Opt::GFXcanvas16Opt(uint16_t w, uint16_t h) : GFXcanvas16(w, h) {}
 
-void GFXcanvas16Opt::fillBitmap(const uint16_t bitmap[])
+void GFXcanvas16Opt::fillBitmap(const uint16_t bitmap[], uint16_t keyColor)
 {
   uint16_t color;
   uint16_t *buff = getBuffer();
   for (short i = 0; i < (width() * height()); i++)
   {
     color = pgm_read_word(&bitmap[i]);
-    if (color != 0xF81F) // magenta
+    if (color != keyColor) // magenta
       buff[i] = color;
   }
 }

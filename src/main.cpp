@@ -117,7 +117,7 @@ void inputs(void)
 
 void loop(void)
 {
-  canvas->fillBitmap(bgImage);
+  canvas->fillBitmap(bgImage, MAGENTA);
 
   inputs();
 
