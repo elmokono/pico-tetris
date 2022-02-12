@@ -17,7 +17,7 @@
 
 #define MAGENTA 0xF81F
 
-Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
+Adafruit_ST7735 *tft = new Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 GFXcanvas16Opt *canvas = new GFXcanvas16Opt(128, 128);
 
 uint lastMillis;
@@ -49,9 +49,9 @@ void setup()
 {
   // while (!Serial) { delay(10); }
   Serial.begin(115200);
-  tft.initR(INITR_144GREENTAB);
-  tft.setRotation(0);
-  tft.fillScreen(ST7735_CYAN);
+  tft->initR(INITR_144GREENTAB);
+  tft->setRotation(0);
+  tft->fillScreen(ST7735_CYAN);
 
   // game
   x = 48;
@@ -127,5 +127,5 @@ void loop(void)
 
   getFps();
 
-  tft.drawRGBBitmap(sx, sy, canvas->getBuffer(), sw, sh);
+  tft->drawRGBBitmap(sx, sy, canvas->getBuffer(), sw, sh);
 }
