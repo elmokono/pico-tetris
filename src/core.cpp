@@ -1,8 +1,18 @@
 #include <stdlib.h>
 #include "core.h"
 
+Piece::Piece()
+{
+    Piece(rand() % 5);
+}
+
 Piece::Piece(int type)
 {
+
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            map[i][j] = false;
+
     switch (type)
     {
     case 0: //'T':
@@ -40,9 +50,21 @@ Piece::Piece(int type)
     }
 }
 
+Core::Core()
+{
+    for (int i = 0; i < 16; i++)
+        for (int j = 0; j < 16; j++)
+            gameMap[i][j] = false;
+}
+
 bool Core::hasBlock(int x, int y)
 {
     return gameMap[x][y];
+}
+
+Piece Core::getCurrentPiece()
+{
+    return currentPiece;    
 }
 
 /*
@@ -55,10 +77,10 @@ void Core::addPiece()
     p.x = 6;
     p.y = 0;
 
-    for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3; j++)
+    /*for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
             if (p.map[i][j])
-                gameMap[p.x + i][p.y + j] = true;
+                gameMap[p.x + i][p.y + j] = true;*/
 
     currentPiece = p;
 }
@@ -66,10 +88,10 @@ void Core::addPiece()
 void Core::movePiece(int direction)
 {
     int pieceWidth = 0;
-    for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3; j++)
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
             if (currentPiece.map[i][j])
-                pieceWidth++;
+                pieceWidth = i;
 
     // check if the piece can move
     switch (direction)
@@ -93,18 +115,21 @@ void Core::movePiece(int direction)
 
 bool Core::checkPieceCollision()
 {
-    for (int x = 0; x < 15; x++)
-        for (int y = 0; y < 15; y++)
+    if (currentPiece.y == 16)
+        return true;
+
+    for (int x = 0; x < 16; x++)
+        for (int y = 0; y < 16; y++)
         {
-            for (int i = 3; i > 0; i--)
-                for (int j = 3; j > 0; j--)
-                {
+            for (int i = 4; i > 0; i--)
+                for (int j = 4; j > 0; j--)
+                {                    
                     if (currentPiece.map[i][j])
                     {
                         if (gameMap[currentPiece.x + i][currentPiece.y + j + 1]) // overlaps with the next row
                         {
-                            for (int pi = 0; pi < 3; pi++)
-                                for (int pj = 0; pj < 3; pj++)
+                            for (int pi = 0; pi < 4; pi++)
+                                for (int pj = 0; pj < 4; pj++)
                                 {
                                     if (currentPiece.map[pi][pj])
                                         gameMap[currentPiece.x + pi][currentPiece.y + pj] = true;

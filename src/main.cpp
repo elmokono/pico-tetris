@@ -2,7 +2,7 @@
 #include <GFXcanvas16Opt.h>  // canvas layer
 #include <Adafruit_ST7735.h> // gpu driver
 #include <SPI.h>
-#include "core.h"
+#include <core.h>
 #include "sprites.h"
 
 #define TFT_DC 21
@@ -91,10 +91,10 @@ void inputs(void)
   // 0-stickXCenter-1023
   float f = analogRead(JOY_AX);
 
-  if (f >= stickXCenter)
-    core->movePiece(1); // aX = 2;
-  else
-    core->movePiece(0); // aX = -2;
+  if (f >= 1000)
+    core->movePiece(1);
+  if (f <= 24)  
+    core->movePiece(0);
 
   // if (digitalRead(JOY_B1) == LOW && aY == 0)
   //   aY = -3;
@@ -106,7 +106,7 @@ void gameCore(void)
   if (millis() - lastMillisMovePiece < millisToMovePiece)
     return;
 
-  millisToMovePiece = millis();
+  lastMillisMovePiece = millis();
   core->movePiece(2); // down
 
   if (core->checkPieceCollision())
@@ -115,16 +115,21 @@ void gameCore(void)
 
 void draw(void)
 {
-  //background
+  // background
   canvas->fillBitmap(bgImage, MAGENTA);
 
-  //sprites
-  for (int i = 0; i < 15; i++)
-    for (int j = 0; j < 15; j++)
-    {
+  // sprites
+  Piece currentPiece = core->getCurrentPiece();
+
+  for (int i = 0; i < 16; i++)
+    for (int j = 0; j < 16; j++)
       if (core->hasBlock(i, j))
-        canvas->drawRGBBitmap(i * 16, j * 16, block, 16, 16, MAGENTA);
-    }
+        canvas->drawRGBBitmap(i * 8, j * 8, block, 8, 8, MAGENTA);
+
+  for (int i = 0; i < 4; i++)
+    for (int j = 0; j < 4; j++)
+      if (currentPiece.map[i][j])
+        canvas->drawRGBBitmap((currentPiece.x + i) * 8, (currentPiece.y + j) * 8, block, 8, 8, MAGENTA);
 
   // fonts
 
