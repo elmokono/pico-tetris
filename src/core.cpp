@@ -3,58 +3,87 @@
 
 Piece::Piece()
 {
-    Piece(rand() % 5);
+    Piece(rand() % 7);
+}
+
+Point::Point(int x, int y)
+{
+    this->x = x;
+    this->y = y;
+}
+
+Point::Point()
+{
+    this->x = 0;
+    this->y = 0;
 }
 
 Piece::Piece(int type)
 {
-
-    for (int i = 0; i < 4; i++)
-        for (int j = 0; j < 4; j++)
-            map[i][j] = false;
-
     switch (type)
     {
     case 0: //'T':
-        map[0][0] = true;
-        map[1][0] = true;
-        map[2][0] = true;
-        map[1][1] = true;
+        blocks[0] = Point(1, 0);
+        blocks[1] = Point(0, 1);
+        blocks[2] = Point(1, 1);
+        blocks[3] = Point(2, 1);
         break;
     case 1: //'L':
-        map[0][0] = true;
-        map[0][1] = true;
-        map[0][2] = true;
-        map[1][2] = true;
+        blocks[0] = Point(2, 0);
+        blocks[1] = Point(1, 0);
+        blocks[2] = Point(1, 1);
+        blocks[3] = Point(1, 2);
         break;
     case 2: //'I':
-        map[0][0] = true;
-        map[1][0] = true;
-        map[2][0] = true;
-        map[3][0] = true;
+        blocks[0] = Point(0, 0);
+        blocks[1] = Point(1, 0);
+        blocks[2] = Point(2, 0);
+        blocks[3] = Point(3, 0);
         break;
-    case 3: //'B':
-        map[0][0] = true;
-        map[1][0] = true;
-        map[0][1] = true;
-        map[1][1] = true;
+    case 3: //'J':
+        blocks[0] = Point(0, 0);
+        blocks[1] = Point(0, 1);
+        blocks[2] = Point(1, 1);
+        blocks[3] = Point(2, 1);
         break;
     case 4: //'S':
-        map[0][0] = true;
-        map[0][1] = true;
-        map[1][1] = true;
-        map[2][2] = true;
+        blocks[0] = Point(1, 0);
+        blocks[1] = Point(2, 0);
+        blocks[2] = Point(0, 1);
+        blocks[3] = Point(1, 1);
+        break;
+    case 5: //'Z':
+        blocks[0] = Point(0, 0);
+        blocks[1] = Point(1, 0);
+        blocks[2] = Point(1, 1);
+        blocks[3] = Point(2, 1);
+        break;
+    case 6: //'O':
+        blocks[0] = Point(0, 0);
+        blocks[1] = Point(1, 0);
+        blocks[2] = Point(0, 1);
+        blocks[3] = Point(1, 1);
         break;
     default:
         break;
+    }
+
+    width = 0;
+    height = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        if (blocks[i].x > width)
+            width = blocks[i].x;
+        if (blocks[i].y > height)
+            height = blocks[i].y;
     }
 }
 
 Core::Core()
 {
     for (int i = 0; i < 16; i++)
-        for (int j = 0; j < 16; j++)
-            gameMap[i][j] = false;
+        for (int j = 0; j < 17; j++)
+            gameMap[i][j] = (j == 16) ? true : false;
 }
 
 bool Core::hasBlock(int x, int y)
@@ -64,7 +93,7 @@ bool Core::hasBlock(int x, int y)
 
 Piece Core::getCurrentPiece()
 {
-    return currentPiece;    
+    return currentPiece;
 }
 
 /*
@@ -73,26 +102,14 @@ Piece Core::getCurrentPiece()
 void Core::addPiece()
 {
     // start position
-    Piece p = Piece(rand() % 5);
+    Piece p = Piece(rand() % 7);
     p.x = 6;
     p.y = 0;
-
-    /*for (int i = 0; i < 4; i++)
-        for (int j = 0; j < 4; j++)
-            if (p.map[i][j])
-                gameMap[p.x + i][p.y + j] = true;*/
-
     currentPiece = p;
 }
 
 void Core::movePiece(int direction)
 {
-    int pieceWidth = 0;
-    for (int i = 0; i < 4; i++)
-        for (int j = 0; j < 4; j++)
-            if (currentPiece.map[i][j])
-                pieceWidth = i;
-
     // check if the piece can move
     switch (direction)
     {
@@ -101,7 +118,7 @@ void Core::movePiece(int direction)
             currentPiece.x--;
         break;
     case 1: // x++
-        if (currentPiece.x + pieceWidth < 16)
+        if (currentPiece.x + currentPiece.width < 15)
             currentPiece.x++;
         break;
     case 2: // y++
@@ -113,32 +130,29 @@ void Core::movePiece(int direction)
     }
 }
 
+void Core::placePiece()
+{
+    for (int i = 0; i < 4; i++)
+        gameMap[currentPiece.blocks[i].x + currentPiece.x][currentPiece.blocks[i].y + currentPiece.y] = true;
+}
+
 bool Core::checkPieceCollision()
 {
-    if (currentPiece.y == 16)
+    /*if (currentPiece.y + currentPiece.height == 16)
+    {
+        placePiece();
         return true;
-
+    }
+*/
     for (int x = 0; x < 16; x++)
-        for (int y = 0; y < 16; y++)
-        {
-            for (int i = 4; i > 0; i--)
-                for (int j = 4; j > 0; j--)
-                {                    
-                    if (currentPiece.map[i][j])
+        for (int y = 0; y < 17; y++)
+            if (gameMap[x][y])
+                for (int i = 0; i < 4; i++)
+                    if (currentPiece.blocks[i].x + currentPiece.x == x && currentPiece.blocks[i].y + currentPiece.y + 1 == y)
                     {
-                        if (gameMap[currentPiece.x + i][currentPiece.y + j + 1]) // overlaps with the next row
-                        {
-                            for (int pi = 0; pi < 4; pi++)
-                                for (int pj = 0; pj < 4; pj++)
-                                {
-                                    if (currentPiece.map[pi][pj])
-                                        gameMap[currentPiece.x + pi][currentPiece.y + pj] = true;
-                                }
-                            return true;
-                        }
+                        placePiece();
+                        return true;
                     }
-                }
-        }
 
     return false;
 }

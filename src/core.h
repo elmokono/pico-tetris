@@ -1,12 +1,18 @@
-/*
-T, L, I, B, S
-*/
+class Point
+{
+    public:
+    Point();
+    Point(int x, int y);
+    int x, y;
+};
+
 class Piece
 {
     public:
     Piece();
     Piece(int type);
-    bool map[4][4];
+    Point blocks[4];
+    int width, height;
     int x, y;
 };
 
@@ -20,6 +26,7 @@ class Core
     bool hasBlock(int x, int y);
     Piece getCurrentPiece(); 
 private:
-    bool gameMap[16][16];
+    bool gameMap[16][17];
     Piece currentPiece;
+    void placePiece();
 };

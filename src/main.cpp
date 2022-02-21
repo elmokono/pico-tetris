@@ -93,7 +93,7 @@ void inputs(void)
 
   if (f >= 1000)
     core->movePiece(1);
-  if (f <= 24)  
+  if (f <= 24)
     core->movePiece(0);
 
   // if (digitalRead(JOY_B1) == LOW && aY == 0)
@@ -107,10 +107,11 @@ void gameCore(void)
     return;
 
   lastMillisMovePiece = millis();
-  core->movePiece(2); // down
-
+  
   if (core->checkPieceCollision())
     core->addPiece();
+  else
+    core->movePiece(2); // down
 }
 
 void draw(void)
@@ -124,12 +125,13 @@ void draw(void)
   for (int i = 0; i < 16; i++)
     for (int j = 0; j < 16; j++)
       if (core->hasBlock(i, j))
-        canvas->drawRGBBitmap(i * 8, j * 8, block, 8, 8, MAGENTA);
+        canvas->drawRGBBitmap(i * 8, j * 8, block_still, 8, 8, MAGENTA);
 
   for (int i = 0; i < 4; i++)
-    for (int j = 0; j < 4; j++)
-      if (currentPiece.map[i][j])
-        canvas->drawRGBBitmap((currentPiece.x + i) * 8, (currentPiece.y + j) * 8, block, 8, 8, MAGENTA);
+    canvas->drawRGBBitmap(
+        (currentPiece.x + currentPiece.blocks[i].x) * 8,
+        (currentPiece.y + currentPiece.blocks[i].y) * 8,
+        block, 8, 8, MAGENTA);
 
   // fonts
 
