@@ -29,10 +29,10 @@ Piece::Piece(int type)
         blocks[3] = Point(2, 1);
         break;
     case 1: //'L':
-        blocks[0] = Point(2, 0);
-        blocks[1] = Point(1, 0);
-        blocks[2] = Point(1, 1);
-        blocks[3] = Point(1, 2);
+        blocks[0] = Point(0, 1);
+        blocks[1] = Point(1, 1);
+        blocks[2] = Point(2, 0);
+        blocks[3] = Point(2, 1);
         break;
     case 2: //'I':
         blocks[0] = Point(0, 0);
