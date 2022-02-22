@@ -111,6 +111,7 @@ Piece Core::getCurrentPiece()
 void Core::addPiece()
 {
     // start position
+    srand(time(NULL));
     currentPiece = Piece(rand() % 7);
     currentPiece.x = 6;
     currentPiece.y = 0;
@@ -169,8 +170,16 @@ bool Core::checkPieceCollision()
             return true;
 
     // start checking from the right/bottom (speedup)
-    for (int x = 15; x > -1; x--)
-        for (int y = 16; y > -1; y--)
+    int bottomCheck = currentPiece.y + currentPiece.height + 1;
+    if (bottomCheck > 17)
+        bottomCheck = 17;
+
+    int rightCheck = currentPiece.x + currentPiece.width + 1;
+    if (rightCheck > 16)
+        rightCheck = 16;
+
+    for (int x = (currentPiece.x == 0 ? 0 : (currentPiece.x - 1)); x < rightCheck; x++)
+        for (int y = currentPiece.y; y < bottomCheck; y++)
             if (gameMap[x][y])
                 for (int i = 3; i > -1; i--)
                     if (currentPiece.blocks[i].x + currentPiece.x == x && currentPiece.blocks[i].y + currentPiece.y == y)
@@ -195,6 +204,8 @@ void Core::rotatePiece(bool cw)
     for (int i = 0; i < 4; i++)
         matrix[currentPiece.blocks[i].x][currentPiece.blocks[i].y] = 1;
 
+    // recalculate measures
+    currentPiece.width = currentPiece.height = 0;
     // rotate matrix
     int n = 0;
     for (int i = 0; i < size; i++)
@@ -202,19 +213,14 @@ void Core::rotatePiece(bool cw)
         {
             destination[i][j] = cw ? matrix[size - j - 1][i] : matrix[j][size - i - 1];
             if (destination[i][j] == 1)
+            {
                 currentPiece.blocks[n++] = Point(i, j);
+                if (i > currentPiece.width)
+                    currentPiece.width = i;
+                if (j > currentPiece.height)
+                    currentPiece.height = j;
+            }
         }
-
-    // recalculate size
-    /*currentPiece.width = 0;
-    currentPiece.height = 0;
-    for (int i = 0; i < 4; i++)
-    {
-        if (currentPiece.blocks[i].x > currentPiece.width)
-            currentPiece.width = currentPiece.blocks[i].x;
-        if (currentPiece.blocks[i].y > currentPiece.height)
-            currentPiece.height = currentPiece.blocks[i].y;
-    }*/
 
     // rollback rotation
     if (checkPieceCollision())
