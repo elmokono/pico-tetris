@@ -1,8 +1,10 @@
 #include <stdlib.h>
+#include <time.h>
 #include "core.h"
 
 Piece::Piece()
 {
+    srand(time(NULL));
     Piece(rand() % 7);
 }
 
@@ -113,20 +115,40 @@ void Core::movePiece(int direction)
     // check if the piece can move
     switch (direction)
     {
-    case 0: // x--
+    case 0: // left
         if (currentPiece.x > 0)
             currentPiece.x--;
         break;
-    case 1: // x++
+    case 1: // right
         if (currentPiece.x + currentPiece.width < 15)
             currentPiece.x++;
         break;
-    case 2: // y++
-        if (!checkPieceCollision())
-            currentPiece.y++;
+    case 2: // down
+        currentPiece.y++;
         break;
     default:
         break;
+    }
+
+    if (checkPieceCollision())
+    {
+        // move back
+        switch (direction)
+        {
+        case 0: // x--
+            currentPiece.x++;
+            break;
+        case 1: // x++
+            currentPiece.x--;
+            break;
+        case 2: // y++
+            currentPiece.y--;
+            placePiece();
+            addPiece();
+            break;
+        default:
+            break;
+        }
     }
 }
 
@@ -138,21 +160,13 @@ void Core::placePiece()
 
 bool Core::checkPieceCollision()
 {
-    /*if (currentPiece.y + currentPiece.height == 16)
-    {
-        placePiece();
-        return true;
-    }
-*/
-    for (int x = 0; x < 16; x++)
-        for (int y = 0; y < 17; y++)
+    // start checking from the right/bottom (speedup)
+    for (int x = 15; x > -1; x--)
+        for (int y = 16; y > -1; y--)
             if (gameMap[x][y])
-                for (int i = 0; i < 4; i++)
-                    if (currentPiece.blocks[i].x + currentPiece.x == x && currentPiece.blocks[i].y + currentPiece.y + 1 == y)
-                    {
-                        placePiece();
+                for (int i = 3; i > -1; i--)
+                    if (currentPiece.blocks[i].x + currentPiece.x == x && currentPiece.blocks[i].y + currentPiece.y == y)
                         return true;
-                    }
 
     return false;
 }

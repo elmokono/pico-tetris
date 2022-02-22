@@ -28,7 +28,7 @@ int16_t sx = 0;
 int16_t sy = 0;
 int16_t sw = 128;
 int16_t sh = 128;
-uint millisToMovePiece = 1000;
+uint millisToMovePiece = 500;
 uint millisToJoy = 100;
 float stickXCenter = 512; // default ideal value
 
@@ -107,11 +107,8 @@ void gameCore(void)
     return;
 
   lastMillisMovePiece = millis();
-  
-  if (core->checkPieceCollision())
-    core->addPiece();
-  else
-    core->movePiece(2); // down
+
+  core->movePiece(2); // down
 }
 
 void draw(void)
