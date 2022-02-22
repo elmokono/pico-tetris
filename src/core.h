@@ -13,6 +13,7 @@ class Piece
     Piece(int type);
     Point blocks[4];
     int width, height;
+    int type;
     int x, y;
 };
 
@@ -21,8 +22,10 @@ class Core
     public:
     Core();
     void addPiece();
+    void reset();
     bool checkPieceCollision(); //true if collision
     void movePiece(int direction);
+    void rotatePiece(bool cw);
     bool hasBlock(int x, int y);
     Piece getCurrentPiece(); 
 private:

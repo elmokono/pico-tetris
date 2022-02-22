@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <stdlib.h>
 #include <time.h>
 #include "core.h"
@@ -22,6 +23,7 @@ Point::Point()
 
 Piece::Piece(int type)
 {
+    this->type = type;
     switch (type)
     {
     case 0: //'T':
@@ -37,10 +39,10 @@ Piece::Piece(int type)
         blocks[3] = Point(2, 1);
         break;
     case 2: //'I':
-        blocks[0] = Point(0, 0);
-        blocks[1] = Point(1, 0);
-        blocks[2] = Point(2, 0);
-        blocks[3] = Point(3, 0);
+        blocks[0] = Point(0, 1);
+        blocks[1] = Point(1, 1);
+        blocks[2] = Point(2, 1);
+        blocks[3] = Point(3, 1);
         break;
     case 3: //'J':
         blocks[0] = Point(0, 0);
@@ -83,6 +85,11 @@ Piece::Piece(int type)
 
 Core::Core()
 {
+    reset();
+}
+
+void Core::reset()
+{
     for (int i = 0; i < 16; i++)
         for (int j = 0; j < 17; j++)
             gameMap[i][j] = (j == 16) ? true : false;
@@ -104,10 +111,9 @@ Piece Core::getCurrentPiece()
 void Core::addPiece()
 {
     // start position
-    Piece p = Piece(rand() % 7);
-    p.x = 6;
-    p.y = 0;
-    currentPiece = p;
+    currentPiece = Piece(rand() % 7);
+    currentPiece.x = 6;
+    currentPiece.y = 0;
 }
 
 void Core::movePiece(int direction)
@@ -116,12 +122,10 @@ void Core::movePiece(int direction)
     switch (direction)
     {
     case 0: // left
-        if (currentPiece.x > 0)
-            currentPiece.x--;
+        currentPiece.x--;
         break;
     case 1: // right
-        if (currentPiece.x + currentPiece.width < 15)
-            currentPiece.x++;
+        currentPiece.x++;
         break;
     case 2: // down
         currentPiece.y++;
@@ -160,6 +164,10 @@ void Core::placePiece()
 
 bool Core::checkPieceCollision()
 {
+    for (int i = 3; i > -1; i--)
+        if (currentPiece.blocks[i].x + currentPiece.x < 0 || currentPiece.blocks[i].x + currentPiece.x > 15)
+            return true;
+
     // start checking from the right/bottom (speedup)
     for (int x = 15; x > -1; x--)
         for (int y = 16; y > -1; y--)
@@ -169,4 +177,46 @@ bool Core::checkPieceCollision()
                         return true;
 
     return false;
+}
+
+void Core::rotatePiece(bool cw)
+{
+    // see https://medium.com/swlh/matrix-rotation-in-javascript-269cae14a124
+    // convert piece to a matrix
+    int size = (currentPiece.width > currentPiece.height ? currentPiece.width : currentPiece.height) + 1;
+
+    int matrix[size][size];
+    int destination[size][size];
+
+    for (int i = 0; i < size; i++)
+        for (int j = 0; j < size; j++)
+            matrix[i][j] = destination[i][j] = 0;
+
+    for (int i = 0; i < 4; i++)
+        matrix[currentPiece.blocks[i].x][currentPiece.blocks[i].y] = 1;
+
+    // rotate matrix
+    int n = 0;
+    for (int i = 0; i < size; i++)
+        for (int j = 0; j < size; j++)
+        {
+            destination[i][j] = cw ? matrix[size - j - 1][i] : matrix[j][size - i - 1];
+            if (destination[i][j] == 1)
+                currentPiece.blocks[n++] = Point(i, j);
+        }
+
+    // recalculate size
+    /*currentPiece.width = 0;
+    currentPiece.height = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        if (currentPiece.blocks[i].x > currentPiece.width)
+            currentPiece.width = currentPiece.blocks[i].x;
+        if (currentPiece.blocks[i].y > currentPiece.height)
+            currentPiece.height = currentPiece.blocks[i].y;
+    }*/
+
+    // rollback rotation
+    if (checkPieceCollision())
+        rotatePiece(!cw);
 }

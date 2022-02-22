@@ -96,8 +96,11 @@ void inputs(void)
   if (f <= 24)
     core->movePiece(0);
 
-  // if (digitalRead(JOY_B1) == LOW && aY == 0)
-  //   aY = -3;
+  if (digitalRead(JOY_B2) == LOW)
+    core->rotatePiece(true);
+
+  if (digitalRead(JOY_B1) == LOW)
+    core->reset();
 }
 
 void gameCore(void)
