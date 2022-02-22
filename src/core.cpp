@@ -92,7 +92,7 @@ void Core::reset()
 {
     for (int i = 0; i < BOARD_WIDTH; i++)
         for (int j = 0; j < BOARD_HEIGHT; j++)
-            gameMap[i][j] = (j == BOARD_HEIGHT) ? true : false;
+            gameMap[i][j] = (j == (BOARD_HEIGHT - 1)) ? true : false;
 }
 
 bool Core::hasBlock(int x, int y)
@@ -181,7 +181,7 @@ bool Core::checkPieceCollision()
     for (int x = (currentPiece.x == 0 ? 0 : (currentPiece.x - 1)); x < rightCheck; x++)
         for (int y = currentPiece.y; y < bottomCheck; y++)
             if (gameMap[x][y])
-                for (int i = 3; i > -1; i--)
+                for (int i = (BLOCKS_PER_PIECE - 1); i > -1; i--)
                     if (currentPiece.blocks[i].x + currentPiece.x == x && currentPiece.blocks[i].y + currentPiece.y == y)
                         return true;
 
