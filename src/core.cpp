@@ -74,7 +74,7 @@ Piece::Piece(int type)
 
     width = 0;
     height = 0;
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < BLOCKS_PER_PIECE; i++)
     {
         if (blocks[i].x > width)
             width = blocks[i].x;
@@ -90,9 +90,9 @@ Core::Core()
 
 void Core::reset()
 {
-    for (int i = 0; i < 16; i++)
-        for (int j = 0; j < 17; j++)
-            gameMap[i][j] = (j == 16) ? true : false;
+    for (int i = 0; i < BOARD_WIDTH; i++)
+        for (int j = 0; j < BOARD_HEIGHT; j++)
+            gameMap[i][j] = (j == BOARD_HEIGHT) ? true : false;
 }
 
 bool Core::hasBlock(int x, int y)
@@ -159,7 +159,7 @@ void Core::movePiece(int direction)
 
 void Core::placePiece()
 {
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < BLOCKS_PER_PIECE; i++)
         gameMap[currentPiece.blocks[i].x + currentPiece.x][currentPiece.blocks[i].y + currentPiece.y] = true;
 }
 
@@ -171,12 +171,12 @@ bool Core::checkPieceCollision()
 
     // start checking from the right/bottom (speedup)
     int bottomCheck = currentPiece.y + currentPiece.height + 1;
-    if (bottomCheck > 17)
-        bottomCheck = 17;
+    if (bottomCheck > BOARD_HEIGHT)
+        bottomCheck = BOARD_HEIGHT;
 
     int rightCheck = currentPiece.x + currentPiece.width + 1;
-    if (rightCheck > 16)
-        rightCheck = 16;
+    if (rightCheck > BOARD_WIDTH)
+        rightCheck = BOARD_WIDTH;
 
     for (int x = (currentPiece.x == 0 ? 0 : (currentPiece.x - 1)); x < rightCheck; x++)
         for (int y = currentPiece.y; y < bottomCheck; y++)
@@ -201,7 +201,7 @@ void Core::rotatePiece(bool cw)
         for (int j = 0; j < size; j++)
             matrix[i][j] = destination[i][j] = 0;
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < BLOCKS_PER_PIECE; i++)
         matrix[currentPiece.blocks[i].x][currentPiece.blocks[i].y] = 1;
 
     // recalculate measures

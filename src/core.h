@@ -1,3 +1,6 @@
+#define BOARD_WIDTH 16
+#define BOARD_HEIGHT 17
+#define BLOCKS_PER_PIECE 4
 class Point
 {
     public:
@@ -11,7 +14,7 @@ class Piece
     public:
     Piece();
     Piece(int type);
-    Point blocks[4];
+    Point blocks[BLOCKS_PER_PIECE];
     int width, height;
     int type;
     int x, y;
@@ -29,7 +32,7 @@ class Core
     bool hasBlock(int x, int y);
     Piece getCurrentPiece(); 
 private:
-    bool gameMap[16][17];
+    bool gameMap[BOARD_WIDTH][BOARD_HEIGHT];
     Piece currentPiece;
     void placePiece();
 };
