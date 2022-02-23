@@ -149,6 +149,7 @@ void Core::movePiece(int direction)
         case 2: // y++
             currentPiece.y--;
             placePiece();
+            checkLineFull();
             addPiece();
             break;
         default:
@@ -161,6 +162,32 @@ void Core::placePiece()
 {
     for (int i = 0; i < BLOCKS_PER_PIECE; i++)
         gameMap[currentPiece.blocks[i].x + currentPiece.x][currentPiece.blocks[i].y + currentPiece.y] = true;
+}
+
+bool Core::checkLineFull()
+{
+    bool full = true;
+    for (int j = BOARD_HEIGHT - 2; j > -1; j--)
+    {
+        full = true;
+        for (int i = 0; i < BOARD_WIDTH; i++)
+            if (!gameMap[i][j])
+            {
+                full = false;
+                break;
+            }
+
+        if (full)
+        {
+            for (int i = 0; i < BOARD_WIDTH; i++)
+                gameMap[i][j] = false;
+            for (int i = j; i > 0; i--)
+                for (int k = 0; k < BOARD_WIDTH; k++)
+                    gameMap[k][i] = gameMap[k][i - 1];
+            j++;
+        }
+    }
+    return true;
 }
 
 bool Core::checkPieceCollision()

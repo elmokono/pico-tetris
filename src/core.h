@@ -27,6 +27,7 @@ class Core
     void addPiece();
     void reset();
     bool checkPieceCollision(); //true if collision
+    bool checkLineFull(); //true if line full
     void movePiece(int direction);
     void rotatePiece(bool cw);
     bool hasBlock(int x, int y);
