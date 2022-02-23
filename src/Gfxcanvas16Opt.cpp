@@ -41,3 +41,46 @@ void GFXcanvas16Opt::drawRGBBitmap(int16_t x, int16_t y, uint16_t *bitmap, int16
   }
   endWrite();
 }
+
+/*
+@param x: drawing position x
+@param y: drawing position y
+@param fontBitmap: sprite bitmap
+@param bitmapWidth: sprite width
+@param offset_x: sprite offset x
+@param offset_y: sprite offset y
+@param w: sprite width
+@param h: sprite height
+@param keyColor: transparent color
+*/
+void GFXcanvas16Opt::drawRGBBitmap(int16_t x, int16_t y, const uint16_t bitmap[], int16_t bitmapWidth, int16_t offset_x, int16_t offset_y, int16_t w, int16_t h, uint16_t keyColor)
+{
+  startWrite();
+  int offset = 0;
+  for (int16_t j = 0; j < h; j++, y++)
+    for (int16_t i = 0; i < w; i++)
+    {
+      offset = (j + offset_y) * bitmapWidth + (i + offset_x);
+      if (bitmap[offset] != keyColor) // transparent
+        writePixel(x + i, y, bitmap[offset]);
+    }
+  endWrite();
+}
+
+void GFXcanvas16Opt::print(int16_t x, int16_t y, const uint16_t fontBitmap[], const char *text, uint16_t keyColor)
+{
+  char symbols[71] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '.', ',', '!', '?', '-', '+', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' '};
+
+  while (*text)
+  {
+    int symbolIndex = 0;
+    for (int i = 0; i < 71; i++)
+      if (symbols[i] == *text)
+        symbolIndex = i;
+
+    drawRGBBitmap(x, y, fontBitmap, 560, symbolIndex * 8, 0, 8, 8, keyColor);
+
+    x += 8;
+    text++;
+  }
+}

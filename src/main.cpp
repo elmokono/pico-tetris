@@ -4,6 +4,7 @@
 #include <SPI.h>
 #include <core.h>
 #include "sprites.h"
+#include "courier_new.h"
 
 #define TFT_DC 21
 #define TFT_CS 17
@@ -134,6 +135,7 @@ void draw(void)
         block, 8, 8, MAGENTA);
 
   // fonts
+  canvas->print(4, 4, font_bitmap, "Score 000345", MAGENTA);
 
   // buffer to screen
   tft->drawRGBBitmap(sx, sy, canvas->getBuffer(), sw, sh);
