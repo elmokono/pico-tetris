@@ -55,7 +55,7 @@ void GFXcanvas16Opt::drawRGBBitmap(int16_t x, int16_t y, const uint16_t bitmap[]
     {
       offset = (j + offset_y) * bitmapWidth + (i + offset_x);
       if (bitmap[offset] != keyColor) // transparent
-        writePixel(x + i, y, bitmap[offset]);
+        writePixel(x + i, y, bitmap[offset]);        
     }
   endWrite();
 }

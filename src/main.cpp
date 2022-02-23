@@ -136,9 +136,10 @@ void draw(void)
         block, 8, 8, MAGENTA);
 
   // fonts
-  char score_label[20];
-  snprintf(score_label, sizeof(score_label), "SCORE %d", score);
-  canvas->print(2, 2, score_label, MAGENTA);
+  canvas->print(2, 2, (char*)"Score", MAGENTA);
+  char score_value[7];
+  snprintf(score_value, sizeof(score_value), "%06d", score);
+  canvas->print(78, 2, score_value, MAGENTA);
 
   // buffer to screen
   tft->drawRGBBitmap(sx, sy, canvas->getBuffer(), sw, sh);
