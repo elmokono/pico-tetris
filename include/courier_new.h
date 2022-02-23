@@ -13,6 +13,12 @@
     #define PROGMEM
 #endif
 
+#define SYMBOLS_COUNT 71
+#define SYMBOL_WIDTH 8
+#define SYMBOL_HEIGHT 8
+
+const char symbols[SYMBOLS_COUNT] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '.', ',', '!', '?', '-', '+', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' '};
+
 const unsigned short font_bitmap[4480] PROGMEM={
 0xF81F, 0xF81F, 0xFFFF, 0xFFFF, 0xFFFF, 0xF81F, 0xF81F, 0xF81F, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xF81F, 0xF81F,   // 0x0010 (16) pixels
 0xF81F, 0xF81F, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xF81F, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xF81F, 0xF81F, 0xF81F,   // 0x0020 (32) pixels

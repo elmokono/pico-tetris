@@ -8,5 +8,5 @@ public:
   void drawRGBBitmap(int16_t x, int16_t y, const uint16_t bitmap[], int16_t w, int16_t h, uint16_t keyColor);
   void drawRGBBitmap(int16_t x, int16_t y, uint16_t *bitmap, int16_t w, int16_t h, uint16_t keyColor);
   void drawRGBBitmap(int16_t x, int16_t y, const uint16_t bitmap[], int16_t bitmapWidth, int16_t offset_x, int16_t offset_y, int16_t w, int16_t h, uint16_t keyColor);
-  void print(int16_t x, int16_t y, const uint16_t fontBitmap[], const char *text, uint16_t keyColor);
+  void print(int16_t x, int16_t y, char *text, uint16_t keyColor);
 };

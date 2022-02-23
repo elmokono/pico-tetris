@@ -1,4 +1,5 @@
 #include "Gfxcanvas16Opt.h"
+#include "courier_new.h"
 
 GFXcanvas16Opt::GFXcanvas16Opt(uint16_t w, uint16_t h) : GFXcanvas16(w, h) {}
 
@@ -18,13 +19,9 @@ void GFXcanvas16Opt::drawRGBBitmap(int16_t x, int16_t y, const uint16_t bitmap[]
 {
   startWrite();
   for (int16_t j = 0; j < h; j++, y++)
-  {
     for (int16_t i = 0; i < w; i++)
-    {
       if (bitmap[j * w + i] != keyColor) // transparent
         writePixel(x + i, y, pgm_read_word(&bitmap[j * w + i]));
-    }
-  }
   endWrite();
 }
 
@@ -32,13 +29,9 @@ void GFXcanvas16Opt::drawRGBBitmap(int16_t x, int16_t y, uint16_t *bitmap, int16
 {
   startWrite();
   for (int16_t j = 0; j < h; j++, y++)
-  {
     for (int16_t i = 0; i < w; i++)
-    {
       if (bitmap[j * w + i] != keyColor) // transparent
         writePixel(x + i, y, bitmap[j * w + i]);
-    }
-  }
   endWrite();
 }
 
@@ -67,18 +60,16 @@ void GFXcanvas16Opt::drawRGBBitmap(int16_t x, int16_t y, const uint16_t bitmap[]
   endWrite();
 }
 
-void GFXcanvas16Opt::print(int16_t x, int16_t y, const uint16_t fontBitmap[], const char *text, uint16_t keyColor)
+void GFXcanvas16Opt::print(int16_t x, int16_t y, char *text, uint16_t keyColor)
 {
-  char symbols[71] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '.', ',', '!', '?', '-', '+', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' '};
-
   while (*text)
   {
     int symbolIndex = 0;
-    for (int i = 0; i < 71; i++)
+    for (int i = 0; i < SYMBOLS_COUNT; i++)
       if (symbols[i] == *text)
         symbolIndex = i;
 
-    drawRGBBitmap(x, y, fontBitmap, 560, symbolIndex * 8, 0, 8, 8, keyColor);
+    drawRGBBitmap(x, y, font_bitmap, (SYMBOLS_COUNT - 1) * SYMBOL_WIDTH, symbolIndex * SYMBOL_WIDTH, 0, SYMBOL_WIDTH, SYMBOL_HEIGHT, keyColor);
 
     x += 8;
     text++;

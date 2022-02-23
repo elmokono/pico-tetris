@@ -4,7 +4,7 @@
 #include <SPI.h>
 #include <core.h>
 #include "sprites.h"
-#include "courier_new.h"
+#include <stdio.h>
 
 #define TFT_DC 21
 #define TFT_CS 17
@@ -29,6 +29,7 @@ int16_t sx = 0;
 int16_t sy = 0;
 int16_t sw = 128;
 int16_t sh = 128;
+int score = 0;
 uint millisToMovePiece = 500;
 uint millisToJoy = 100;
 float stickXCenter = 512; // default ideal value
@@ -135,7 +136,9 @@ void draw(void)
         block, 8, 8, MAGENTA);
 
   // fonts
-  canvas->print(4, 4, font_bitmap, "Score 000345", MAGENTA);
+  char score_label[20];
+  snprintf(score_label, sizeof(score_label), "SCORE %d", score);
+  canvas->print(2, 2, score_label, MAGENTA);
 
   // buffer to screen
   tft->drawRGBBitmap(sx, sy, canvas->getBuffer(), sw, sh);
