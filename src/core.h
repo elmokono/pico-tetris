@@ -33,9 +33,11 @@ class Core
     bool hasBlock(int x, int y);
     Piece getCurrentPiece(); 
     int getScore();
+    bool isGameOver();
 private:
     bool gameMap[BOARD_WIDTH][BOARD_HEIGHT];
     Piece currentPiece;
     void placePiece();
     int score;
+    bool gameOver;
 };

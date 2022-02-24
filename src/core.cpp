@@ -3,12 +3,6 @@
 #include <time.h>
 #include "core.h"
 
-Piece::Piece()
-{
-    srand(time(NULL));
-    Piece(rand() % 7);
-}
-
 Point::Point(int x, int y)
 {
     this->x = x;
@@ -19,6 +13,12 @@ Point::Point()
 {
     this->x = 0;
     this->y = 0;
+}
+
+Piece::Piece()
+{
+    srand(time(NULL));
+    Piece(rand() % 7);
 }
 
 Piece::Piece(int type)
@@ -83,14 +83,25 @@ Piece::Piece(int type)
     }
 }
 
+Piece Core::getCurrentPiece()
+{
+    return currentPiece;
+}
+
 Core::Core()
 {
     reset();
 }
 
+bool Core::isGameOver()
+{
+    return gameOver;
+}
+
 void Core::reset()
 {
     score = 0;
+    gameOver = false;
     for (int i = 0; i < BOARD_WIDTH; i++)
         for (int j = 0; j < BOARD_HEIGHT; j++)
             gameMap[i][j] = (j == (BOARD_HEIGHT - 1)) ? true : false;
@@ -106,14 +117,6 @@ bool Core::hasBlock(int x, int y)
     return gameMap[x][y];
 }
 
-Piece Core::getCurrentPiece()
-{
-    return currentPiece;
-}
-
-/*
-@brief: add a piece to the game map
-*/
 void Core::addPiece()
 {
     // start position
@@ -121,6 +124,9 @@ void Core::addPiece()
     currentPiece = Piece(rand() % 7);
     currentPiece.x = 6;
     currentPiece.y = 0;
+
+    if (checkPieceCollision())
+        gameOver = true;
 }
 
 void Core::movePiece(int direction)
