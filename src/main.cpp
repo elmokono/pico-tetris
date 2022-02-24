@@ -103,10 +103,8 @@ void input_joy(void)
     core->movePiece(2);
 }
 
-void inputs(void)
+void input_buttons(void)
 {
-  input_joy();
-
   if (digitalRead(JOY_B2) == HIGH && button2Pressed)
     button2Pressed = false;
   else if (digitalRead(JOY_B2) == LOW && !button2Pressed)
@@ -122,6 +120,12 @@ void inputs(void)
     button1Pressed = true;
     core->reset();
   }
+}
+
+void inputs(void)
+{
+  input_joy();
+  input_buttons();
 }
 
 void gameCore(void)
