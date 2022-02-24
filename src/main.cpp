@@ -122,13 +122,12 @@ void draw(void)
   canvas->fillBitmap(bgImage, MAGENTA);
 
   // sprites
-  Piece currentPiece = core->getCurrentPiece();
-
   for (int i = 0; i < BOARD_WIDTH; i++)
     for (int j = 0; j < (BOARD_HEIGHT-1); j++)
       if (core->hasBlock(i, j))
-        canvas->drawRGBBitmap(i * 8, j * 8, block_still, 8, 8, MAGENTA);
+        canvas->drawRGBBitmapMemCpy(i * 8, j * 8, block_still, 8, 8, MAGENTA);
 
+  Piece currentPiece = core->getCurrentPiece();
   for (int i = 0; i < BLOCKS_PER_PIECE; i++)
     canvas->drawRGBBitmap(
         (currentPiece.x + currentPiece.blocks[i].x) * 8,

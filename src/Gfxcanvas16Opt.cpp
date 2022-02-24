@@ -21,17 +21,17 @@ void GFXcanvas16Opt::drawRGBBitmap(int16_t x, int16_t y, const uint16_t bitmap[]
   for (int16_t j = 0; j < h; j++, y++)
     for (int16_t i = 0; i < w; i++)
       if (bitmap[j * w + i] != keyColor) // transparent
-        writePixel(x + i, y, pgm_read_word(&bitmap[j * w + i]));
+        writePixel(x + i, y, bitmap[j * w + i]);
   endWrite();
 }
 
-void GFXcanvas16Opt::drawRGBBitmap(int16_t x, int16_t y, uint16_t *bitmap, int16_t w, int16_t h, uint16_t keyColor)
+void GFXcanvas16Opt::drawRGBBitmapMemCpy(int16_t x, int16_t y, const uint16_t bitmap[], int16_t w, int16_t h, uint16_t keyColor)
 {
+  uint16_t *buff = getBuffer();
+
   startWrite();
-  for (int16_t j = 0; j < h; j++, y++)
-    for (int16_t i = 0; i < w; i++)
-      if (bitmap[j * w + i] != keyColor) // transparent
-        writePixel(x + i, y, bitmap[j * w + i]);
+  for (int16_t j = 0; j < h; j++)
+    memcpy(&buff[(y + j) * width() + x], &bitmap[j * w], w * sizeof(uint16_t));
   endWrite();
 }
 
@@ -55,7 +55,7 @@ void GFXcanvas16Opt::drawRGBBitmap(int16_t x, int16_t y, const uint16_t bitmap[]
     {
       offset = (j + offset_y) * bitmapWidth + (i + offset_x);
       if (bitmap[offset] != keyColor) // transparent
-        writePixel(x + i, y, bitmap[offset]);        
+        writePixel(x + i, y, bitmap[offset]);
     }
   endWrite();
 }
