@@ -25,7 +25,7 @@ void GFXcanvas16Opt::drawRGBBitmap(int16_t x, int16_t y, const uint16_t bitmap[]
   endWrite();
 }
 
-void GFXcanvas16Opt::drawRGBBitmapMemCpy(int16_t x, int16_t y, const uint16_t bitmap[], int16_t w, int16_t h, uint16_t keyColor)
+void GFXcanvas16Opt::drawRGBBitmap(int16_t x, int16_t y, const uint16_t bitmap[], int16_t w, int16_t h)
 {
   uint16_t *buff = getBuffer();
 

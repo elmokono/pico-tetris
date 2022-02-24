@@ -24,6 +24,7 @@ GFXcanvas16Opt *canvas = new GFXcanvas16Opt(128, 128);
 Core *core = new Core();
 
 uint lastMillis, lastMillisMovePiece, lastMillisJoy;
+bool button1Pressed = false, button2Pressed = false;
 float fps;
 int16_t sx = 0;
 int16_t sy = 0;
@@ -84,25 +85,43 @@ void getFps(void)
   }
 }
 
-void inputs(void)
+void input_joy(void)
 {
   if (millis() - lastMillisJoy < millisToJoy)
     return;
   lastMillisJoy = millis();
 
   // 0-stickXCenter-1023
-  float f = analogRead(JOY_AX);
+  float x = analogRead(JOY_AX);
+  float y = analogRead(JOY_AY);
 
-  if (f >= 1000)
+  if (x >= 1000)
     core->movePiece(1);
-  if (f <= 24)
+  if (x <= 24)
     core->movePiece(0);
+  if (y >= 1000)
+    core->movePiece(2);
+}
 
-  if (digitalRead(JOY_B2) == LOW)
-    core->rotatePiece(true);
+void inputs(void)
+{
+  input_joy();
 
-  if (digitalRead(JOY_B1) == LOW)
+  if (digitalRead(JOY_B2) == HIGH && button2Pressed)
+    button2Pressed = false;
+  else if (digitalRead(JOY_B2) == LOW && !button2Pressed)
+  {
+    button2Pressed = true;
+    core->rotatePiece(2);
+  }
+
+  if (digitalRead(JOY_B1) == HIGH && button1Pressed)
+    button1Pressed = false;
+  else if (digitalRead(JOY_B1) == LOW && !button1Pressed)
+  {
+    button1Pressed = true;
     core->reset();
+  }
 }
 
 void gameCore(void)
@@ -123,9 +142,9 @@ void draw(void)
 
   // sprites
   for (int i = 0; i < BOARD_WIDTH; i++)
-    for (int j = 0; j < (BOARD_HEIGHT-1); j++)
+    for (int j = 0; j < (BOARD_HEIGHT - 1); j++)
       if (core->hasBlock(i, j))
-        canvas->drawRGBBitmapMemCpy(i * 8, j * 8, block_still, 8, 8, MAGENTA);
+        canvas->drawRGBBitmap(i * 8, j * 8, block_still, 8, 8);
 
   Piece currentPiece = core->getCurrentPiece();
   for (int i = 0; i < BLOCKS_PER_PIECE; i++)
@@ -135,7 +154,7 @@ void draw(void)
         block, 8, 8, MAGENTA);
 
   // fonts
-  canvas->print(2, 2, (char*)"Score", MAGENTA);
+  canvas->print(2, 2, (char *)"Score", MAGENTA);
   char score_value[7];
   snprintf(score_value, sizeof(score_value), "%06d", score);
   canvas->print(78, 2, score_value, MAGENTA);
