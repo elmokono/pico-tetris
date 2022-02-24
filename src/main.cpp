@@ -30,7 +30,6 @@ int16_t sx = 0;
 int16_t sy = 0;
 int16_t sw = 128;
 int16_t sh = 128;
-int score = 0;
 uint millisToMovePiece = 500;
 uint millisToJoy = 100;
 float stickXCenter = 512; // default ideal value
@@ -160,7 +159,7 @@ void draw(void)
   // fonts
   canvas->print(2, 2, (char *)"Score", MAGENTA);
   char score_value[7];
-  snprintf(score_value, sizeof(score_value), "%06d", score);
+  snprintf(score_value, sizeof(score_value), "%06d", core->getScore());
   canvas->print(78, 2, score_value, MAGENTA);
 
   // buffer to screen

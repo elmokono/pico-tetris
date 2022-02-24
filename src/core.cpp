@@ -90,9 +90,15 @@ Core::Core()
 
 void Core::reset()
 {
+    score = 0;
     for (int i = 0; i < BOARD_WIDTH; i++)
         for (int j = 0; j < BOARD_HEIGHT; j++)
             gameMap[i][j] = (j == (BOARD_HEIGHT - 1)) ? true : false;
+}
+
+int Core::getScore()
+{
+    return score;
 }
 
 bool Core::hasBlock(int x, int y)
@@ -166,6 +172,7 @@ void Core::placePiece()
 
 bool Core::checkLineFull()
 {
+    int rowsFull = 0;
     bool full = true;
     for (int j = BOARD_HEIGHT - 2; j > -1; j--)
     {
@@ -185,8 +192,13 @@ bool Core::checkLineFull()
                 for (int k = 0; k < BOARD_WIDTH; k++)
                     gameMap[k][i] = gameMap[k][i - 1];
             j++;
+            rowsFull++;
         }
     }
+
+    if (rowsFull > 0)
+        score += rowsFull * rowsFull * 10;
+
     return true;
 }
 

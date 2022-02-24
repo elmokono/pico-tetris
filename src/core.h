@@ -32,8 +32,10 @@ class Core
     void rotatePiece(bool cw);
     bool hasBlock(int x, int y);
     Piece getCurrentPiece(); 
+    int getScore();
 private:
     bool gameMap[BOARD_WIDTH][BOARD_HEIGHT];
     Piece currentPiece;
     void placePiece();
+    int score;
 };
