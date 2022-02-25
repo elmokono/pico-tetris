@@ -102,9 +102,12 @@ void Core::reset()
 {
     score = 0;
     gameOver = false;
+    
     for (int i = 0; i < BOARD_WIDTH; i++)
         for (int j = 0; j < BOARD_HEIGHT; j++)
             gameMap[i][j] = (j == (BOARD_HEIGHT - 1)) ? true : false;
+    
+    addPiece();
 }
 
 int Core::getScore()

@@ -17,6 +17,10 @@
 #define JOY_B1 6
 #define JOY_B2 7
 
+#define STAGE_TITLE_SCREEN 0
+#define STAGE_INGAME 1
+#define STAGE_GAMEOVER 2
+
 #define MAGENTA 0xF81F
 
 Adafruit_ST7735 *tft = new Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
@@ -33,6 +37,7 @@ int16_t sh = 128;
 uint millisToMovePiece = 500;
 uint millisToJoy = 100;
 float stickXCenter = 512; // default ideal value
+int currentStage = STAGE_TITLE_SCREEN;
 
 void calibrateStick(void)
 {
@@ -68,8 +73,10 @@ void setup()
   lastMillisJoy = millis();
 
   // game
-  core->addPiece();
+  core->reset();
   lastMillisMovePiece = millis();
+
+  currentStage = STAGE_INGAME;
 }
 
 void getFps(void)
@@ -94,12 +101,16 @@ void input_joy(void)
   float x = analogRead(JOY_AX);
   float y = analogRead(JOY_AY);
 
-  if (x >= 1000)
-    core->movePiece(1);
-  if (x <= 24)
-    core->movePiece(0);
-  if (y >= 1000)
-    core->movePiece(2);
+  // control tetris
+  if (currentStage == STAGE_INGAME)
+  {
+    if (x >= 1000)
+      core->movePiece(1);
+    if (x <= 24)
+      core->movePiece(0);
+    if (y >= 1000)
+      core->movePiece(2);
+  }
 }
 
 void input_buttons(void)
@@ -109,7 +120,15 @@ void input_buttons(void)
   else if (digitalRead(JOY_B2) == LOW && !button2Pressed)
   {
     button2Pressed = true;
-    core->rotatePiece(2);
+    if (currentStage == STAGE_INGAME)
+    {
+      core->rotatePiece(2);
+    }
+    if (currentStage == STAGE_GAMEOVER)
+    {
+      core->reset();
+      currentStage = STAGE_INGAME;
+    }
   }
 
   if (digitalRead(JOY_B1) == HIGH && button1Pressed)
@@ -117,7 +136,14 @@ void input_buttons(void)
   else if (digitalRead(JOY_B1) == LOW && !button1Pressed)
   {
     button1Pressed = true;
-    core->reset();
+    if (currentStage == STAGE_INGAME)
+    {
+      // ideas?
+    }
+    if (currentStage == STAGE_GAMEOVER)
+    {
+      core->reset();
+    }
   }
 }
 
@@ -129,13 +155,21 @@ void inputs(void)
 
 void gameCore(void)
 {
-  // move piece down
-  if (millis() - lastMillisMovePiece < millisToMovePiece)
-    return;
+  if (currentStage == STAGE_INGAME)
+  {
+    // move piece down
+    if (millis() - lastMillisMovePiece < millisToMovePiece)
+      return;
 
-  lastMillisMovePiece = millis();
+    lastMillisMovePiece = millis();
 
-  core->movePiece(2); // down
+    core->movePiece(2); // down
+
+    if (core->isGameOver())
+    {
+      currentStage = STAGE_GAMEOVER;
+    }
+  }
 }
 
 void draw(void)
@@ -143,24 +177,35 @@ void draw(void)
   // background
   canvas->fillBitmap(bgImage, MAGENTA);
 
-  // sprites
-  for (int i = 0; i < BOARD_WIDTH; i++)
-    for (int j = 0; j < (BOARD_HEIGHT - 1); j++)
-      if (core->hasBlock(i, j))
-        canvas->drawRGBBitmap(i * 8, j * 8, block_still, 8, 8);
+  if (currentStage == STAGE_INGAME || currentStage == STAGE_GAMEOVER)
+  {
+    // sprites
+    for (int i = 0; i < BOARD_WIDTH; i++)
+      for (int j = 0; j < (BOARD_HEIGHT - 1); j++)
+        if (core->hasBlock(i, j))
+          canvas->drawRGBBitmap(i * 8, j * 8, block_still, 8, 8);
+    
+    if (currentStage == STAGE_INGAME)
+    {
+      Piece currentPiece = core->getCurrentPiece();
+      for (int i = 0; i < BLOCKS_PER_PIECE; i++)
+        canvas->drawRGBBitmap(
+            (currentPiece.x + currentPiece.blocks[i].x) * 8,
+            (currentPiece.y + currentPiece.blocks[i].y) * 8,
+            block, 8, 8, MAGENTA);
+    }
 
-  Piece currentPiece = core->getCurrentPiece();
-  for (int i = 0; i < BLOCKS_PER_PIECE; i++)
-    canvas->drawRGBBitmap(
-        (currentPiece.x + currentPiece.blocks[i].x) * 8,
-        (currentPiece.y + currentPiece.blocks[i].y) * 8,
-        block, 8, 8, MAGENTA);
+    // fonts
+    canvas->print(2, 2, (char *)"Score", MAGENTA);
+    char score_value[7];
+    snprintf(score_value, sizeof(score_value), "%06d", core->getScore());
+    canvas->print(78, 2, score_value, MAGENTA);
+  }
 
-  // fonts
-  canvas->print(2, 2, (char *)"Score", MAGENTA);
-  char score_value[7];
-  snprintf(score_value, sizeof(score_value), "%06d", core->getScore());
-  canvas->print(78, 2, score_value, MAGENTA);
+  if (currentStage == STAGE_GAMEOVER)
+  {
+    canvas->drawRGBBitmap(0, 48, gameover, 128, 32, MAGENTA);
+  }
 
   // buffer to screen
   tft->drawRGBBitmap(sx, sy, canvas->getBuffer(), sw, sh);
