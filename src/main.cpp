@@ -23,11 +23,14 @@
 
 #define MAGENTA 0xF81F
 
+#define PRESS_ANY_KEY "-PRESS ANY KEY-"
+
 Adafruit_ST7735 *tft = new Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 GFXcanvas16Opt *canvas = new GFXcanvas16Opt(128, 128);
 Core *core = new Core();
 
-uint lastMillis, lastMillisMovePiece, lastMillisJoy;
+uint lastMillis, lastMillisMovePiece, lastMillisJoy, lastMillisTitleScreen;
+bool titleScreenOn = true;
 bool button1Pressed = false, button2Pressed = false;
 float fps;
 int16_t sx = 0;
@@ -36,6 +39,7 @@ int16_t sw = 128;
 int16_t sh = 128;
 uint millisToMovePiece = 500;
 uint millisToJoy = 100;
+uint millisToTitleScreen = 700;
 float stickXCenter = 512; // default ideal value
 int currentStage = STAGE_TITLE_SCREEN;
 
@@ -75,8 +79,7 @@ void setup()
   // game
   core->reset();
   lastMillisMovePiece = millis();
-
-  currentStage = STAGE_INGAME;
+  lastMillisTitleScreen = millis();
 }
 
 void getFps(void)
@@ -129,6 +132,11 @@ void input_buttons(void)
       core->reset();
       currentStage = STAGE_INGAME;
     }
+    if (currentStage == STAGE_TITLE_SCREEN)
+    {
+      core->reset();
+      currentStage = STAGE_INGAME;
+    }
   }
 
   if (digitalRead(JOY_B1) == HIGH && button1Pressed)
@@ -144,6 +152,11 @@ void input_buttons(void)
     {
       core->reset();
     }
+    if (currentStage == STAGE_TITLE_SCREEN)
+    {
+      core->reset();
+      currentStage = STAGE_INGAME;
+    }
   }
 }
 
@@ -155,6 +168,14 @@ void inputs(void)
 
 void gameCore(void)
 {
+  if (currentStage == STAGE_TITLE_SCREEN)
+  {
+    if (millis() - lastMillisTitleScreen < millisToTitleScreen)
+      return;
+    lastMillisTitleScreen = millis();
+    titleScreenOn = !titleScreenOn;
+  }
+
   if (currentStage == STAGE_INGAME)
   {
     // move piece down
@@ -174,17 +195,25 @@ void gameCore(void)
 
 void draw(void)
 {
-  // background
-  canvas->fillBitmap(bgImage, MAGENTA);
+  if (currentStage == STAGE_TITLE_SCREEN)
+  {
+    canvas->fillBitmap(title_screen);
+
+    if (titleScreenOn)
+      canvas->print(4, 96, (char *)PRESS_ANY_KEY, MAGENTA);
+  }
 
   if (currentStage == STAGE_INGAME || currentStage == STAGE_GAMEOVER)
   {
+    // background
+    canvas->fillBitmap(bgImage, MAGENTA);
+
     // sprites
     for (int i = 0; i < BOARD_WIDTH; i++)
       for (int j = 0; j < (BOARD_HEIGHT - 1); j++)
         if (core->hasBlock(i, j))
           canvas->drawRGBBitmap(i * 8, j * 8, block_still, 8, 8);
-    
+
     if (currentStage == STAGE_INGAME)
     {
       Piece currentPiece = core->getCurrentPiece();
