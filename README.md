@@ -1,6 +1,7 @@
 # Raspberry Pi Pico Tetris
 
 Simple Tetris using graphics backbuffer technique. Working at 62 to 55 fps.
+Also using custom bitmap-fonts
 
 Dependencies
 
@@ -45,3 +46,6 @@ Wiring
 References for rotation and collisions: \
 https://tetris.fandom.com/wiki/SRS \
 https://medium.com/swlh/matrix-rotation-in-javascript-269cae14a124
+
+Image convertion: \
+http://www.rinkydinkelectronics.com/t_imageconverter565.php
