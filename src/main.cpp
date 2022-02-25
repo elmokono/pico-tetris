@@ -151,6 +151,7 @@ void input_buttons(void)
     if (currentStage == STAGE_GAMEOVER)
     {
       core->reset();
+      currentStage = STAGE_INGAME;
     }
     if (currentStage == STAGE_TITLE_SCREEN)
     {
