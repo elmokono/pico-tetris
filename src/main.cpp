@@ -65,7 +65,7 @@ void setup()
   // while (!Serial) { delay(10); }
   Serial.begin(115200);
   tft->initR(INITR_144GREENTAB);
-  tft->setRotation(0);
+  tft->setRotation(2);
   tft->fillScreen(ST7735_CYAN);
 
   // game
