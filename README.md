@@ -37,6 +37,12 @@ Wiring
 - AxisY gpio 27 (customizable)
 - Button gpio 22 (customizable)
 
+**RGB**
+- GND GND
+- R gpio 16
+- G gpio 18
+- B gpio 19
+
 **Buttons**
 
 - Button1 gpio 6 (customizable)

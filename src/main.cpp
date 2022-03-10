@@ -17,6 +17,10 @@
 #define JOY_B1 6
 #define JOY_B2 7
 
+#define RGB_R 16
+#define RGB_G 18
+#define RGB_B 19
+
 #define STAGE_TITLE_SCREEN 0
 #define STAGE_INGAME 1
 #define STAGE_GAMEOVER 2
@@ -60,6 +64,13 @@ void calibrateStick(void)
   stickXCenter = (xCenterAvg / samples);
 }
 
+void rgb(short r, short g, short b)
+{
+  analogWrite(RGB_R, r);
+  analogWrite(RGB_G, g);
+  analogWrite(RGB_B, b);
+}
+
 void setup()
 {
   // while (!Serial) { delay(10); }
@@ -68,6 +79,11 @@ void setup()
   tft->setRotation(2);
   tft->fillScreen(ST7735_CYAN);
 
+  //rgb
+  pinMode(RGB_R, OUTPUT);
+  pinMode(RGB_G, OUTPUT);
+  pinMode(RGB_B, OUTPUT);
+    
   // game
   fps = 0;
   lastMillis = millis();
@@ -175,6 +191,10 @@ void gameCore(void)
       return;
     lastMillisTitleScreen = millis();
     titleScreenOn = !titleScreenOn;
+    if (titleScreenOn)
+      rgb(0, 0, 1024);
+    else
+      rgb(0, 0, 0);
   }
 
   if (currentStage == STAGE_INGAME)
