@@ -2,7 +2,7 @@
 #include <GFXcanvas16Opt.h>  // canvas layer
 #include <Adafruit_ST7735.h> // gpu driver
 #include <SPI.h>
-#include <core.h>
+#include <tetris_core.h>
 #include "sprites.h"
 #include <stdio.h>
 #include <Adafruit_MPU6050.h>
@@ -39,7 +39,7 @@
 Adafruit_ST7735 *tft = new Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 GFXcanvas16Opt *canvas = new GFXcanvas16Opt(128, 128);
 Adafruit_MPU6050 mpu;
-Core *core = new Core();
+TetrisCore *core = new TetrisCore();
 
 uint lastMillis, lastMillisMovePiece, lastMillisJoy, lastMillisTitleScreen;
 bool titleScreenOn = true;
