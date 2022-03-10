@@ -5,6 +5,9 @@
 #include <core.h>
 #include "sprites.h"
 #include <stdio.h>
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
+#include <Wire.h>
 
 #define TFT_DC 21
 #define TFT_CS 17
@@ -14,8 +17,12 @@
 #define JOY_AY 27
 #define JOY_BT 22
 
-#define JOY_B1 6
-#define JOY_B2 7
+//#define GYRO_SDA 6
+//#define GYRO_SCL 7
+
+#define JOY_B1 8
+#define JOY_B2 9
+#define JOY_B3 10
 
 #define RGB_R 16
 #define RGB_G 18
@@ -31,6 +38,7 @@
 
 Adafruit_ST7735 *tft = new Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 GFXcanvas16Opt *canvas = new GFXcanvas16Opt(128, 128);
+Adafruit_MPU6050 mpu;
 Core *core = new Core();
 
 uint lastMillis, lastMillisMovePiece, lastMillisJoy, lastMillisTitleScreen;
@@ -71,6 +79,83 @@ void rgb(short r, short g, short b)
   analogWrite(RGB_B, b);
 }
 
+void setup_gyro(void)
+{
+  if (!mpu.begin())
+  {
+    Serial.println("Failed to find MPU6050 chip");
+    while (1)
+    {
+      delay(10);
+    }
+  }
+
+  mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
+  Serial.print("Accelerometer range set to: ");
+  switch (mpu.getAccelerometerRange())
+  {
+  case MPU6050_RANGE_2_G:
+    Serial.println("+-2G");
+    break;
+  case MPU6050_RANGE_4_G:
+    Serial.println("+-4G");
+    break;
+  case MPU6050_RANGE_8_G:
+    Serial.println("+-8G");
+    break;
+  case MPU6050_RANGE_16_G:
+    Serial.println("+-16G");
+    break;
+  }
+  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+  Serial.print("Gyro range set to: ");
+  switch (mpu.getGyroRange())
+  {
+  case MPU6050_RANGE_250_DEG:
+    Serial.println("+- 250 deg/s");
+    break;
+  case MPU6050_RANGE_500_DEG:
+    Serial.println("+- 500 deg/s");
+    break;
+  case MPU6050_RANGE_1000_DEG:
+    Serial.println("+- 1000 deg/s");
+    break;
+  case MPU6050_RANGE_2000_DEG:
+    Serial.println("+- 2000 deg/s");
+    break;
+  }
+
+  mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
+  Serial.print("Filter bandwidth set to: ");
+  switch (mpu.getFilterBandwidth())
+  {
+  case MPU6050_BAND_260_HZ:
+    Serial.println("260 Hz");
+    break;
+  case MPU6050_BAND_184_HZ:
+    Serial.println("184 Hz");
+    break;
+  case MPU6050_BAND_94_HZ:
+    Serial.println("94 Hz");
+    break;
+  case MPU6050_BAND_44_HZ:
+    Serial.println("44 Hz");
+    break;
+  case MPU6050_BAND_21_HZ:
+    Serial.println("21 Hz");
+    break;
+  case MPU6050_BAND_10_HZ:
+    Serial.println("10 Hz");
+    break;
+  case MPU6050_BAND_5_HZ:
+    Serial.println("5 Hz");
+    break;
+  }
+
+  Serial.println("");
+  delay(100);
+}
+
 void setup()
 {
   // while (!Serial) { delay(10); }
@@ -79,11 +164,11 @@ void setup()
   tft->setRotation(2);
   tft->fillScreen(ST7735_CYAN);
 
-  //rgb
+  // rgb
   pinMode(RGB_R, OUTPUT);
   pinMode(RGB_G, OUTPUT);
   pinMode(RGB_B, OUTPUT);
-    
+
   // game
   fps = 0;
   lastMillis = millis();
@@ -96,6 +181,9 @@ void setup()
   core->reset();
   lastMillisMovePiece = millis();
   lastMillisTitleScreen = millis();
+
+  // gyro
+  setup_gyro();
 }
 
 void getFps(void)
@@ -108,6 +196,34 @@ void getFps(void)
     fps = 0;
     lastMillis = millis();
   }
+}
+
+void input_gyro(void)
+{
+  /* Get new sensor events with the readings */
+  sensors_event_t a, g, temp;
+  mpu.getEvent(&a, &g, &temp);
+
+  /* Print out the values */
+  Serial.print("Acceleration X: ");
+  Serial.print(a.acceleration.x);
+  Serial.print(", Y: ");
+  Serial.print(a.acceleration.y);
+  Serial.print(", Z: ");
+  Serial.print(a.acceleration.z);
+  Serial.println(" m/s^2");
+
+  Serial.print("Rotation X: ");
+  Serial.print(g.gyro.x);
+  Serial.print(", Y: ");
+  Serial.print(g.gyro.y);
+  Serial.print(", Z: ");
+  Serial.print(g.gyro.z);
+  Serial.println(" rad/s");
+
+  Serial.print("Temperature: ");
+  Serial.print(temp.temperature);
+  Serial.println(" degC");
 }
 
 void input_joy(void)
@@ -179,6 +295,7 @@ void input_buttons(void)
 
 void inputs(void)
 {
+  //input_gyro();
   input_joy();
   input_buttons();
 }

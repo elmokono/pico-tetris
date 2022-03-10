@@ -43,10 +43,17 @@ Wiring
 - G gpio 18
 - B gpio 19
 
+**Gyro**
+- 5V VBUS
+- GND GND
+- SDA gpio 6
+- SCL gpio 7
+
 **Buttons**
 
-- Button1 gpio 6 (customizable)
-- Button2 gpio 7 (customizable)
+- Button1 gpio 8 (customizable)
+- Button2 gpio 9 (customizable)
+- Button3 gpio 10 (customizable)
 - GND GND
 
 References for rotation and collisions: \
