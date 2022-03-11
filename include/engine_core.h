@@ -58,16 +58,17 @@ public:
     void rgb(short r, short g, short b);
     gyro_state input_gyro(void);
     joystick_state input_joy(void);
-    void getFps(void);
+    void loop(void);
     void draw(uint16_t* buffer);
+    short fps;
 
 private:
     Adafruit_MPU6050 mpu;  
     Adafruit_ST7735 *tft = new Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);  
     uint lastMillis, lastMillisJoy;
-    bool button1Pressed = false, button2Pressed = false, button3Pressed = false;
-    float fps;
+    bool button1Pressed = false, button2Pressed = false, button3Pressed = false;    
     uint millisToJoy = 100;
+    short intFps = 0;
     float stickXCenter = 512; float stickYCenter = 512;// default ideal value
     void setup_gyro(void);
     

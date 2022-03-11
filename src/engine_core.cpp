@@ -1,4 +1,3 @@
-#include "engine_core.h"
 #include <Arduino.h>
 #include <Adafruit_ST7735.h> // gpu driver
 #include <SPI.h>
@@ -6,6 +5,8 @@
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
+
+#include "engine_core.h"
 
 Engine::Engine()
 {
@@ -17,7 +18,7 @@ Engine::Engine()
     pinMode(RGB_G, OUTPUT);
     pinMode(RGB_B, OUTPUT);
 
-    fps = 0;
+    fps = intFps = 0;
     lastMillis = millis();
 
     // joy
@@ -36,7 +37,7 @@ joystick_state Engine::input_joy(void)
 {
     joystick_state joy;
 
-    joy.b1 = joy.b2 = joy.b3 = false;
+    joy.b1 = joy.b2 = joy.b3 = joy.b1down = joy.b2down = joy.b3down = false;
     joy.x = stickXCenter;
     joy.y = stickYCenter;
 
@@ -71,15 +72,14 @@ joystick_state Engine::input_joy(void)
     return joy;
 }
 
-void Engine::getFps(void)
+void Engine::loop(void)
 {
-    fps++;
+    intFps++;
     if (millis() - lastMillis >= 1000)
     {
-        Serial.print(fps);
-        Serial.println(" fps");
-        fps = 0;
         lastMillis = millis();
+        fps = intFps;
+        intFps = 0;
     }
 }
 
@@ -202,9 +202,9 @@ void Engine::setup_gyro(void)
 
 void Engine::rgb(short r, short g, short b)
 {
-    analogWrite(RGB_R, r);
-    analogWrite(RGB_G, g);
-    analogWrite(RGB_B, b);
+    analogWrite(RGB_R, r * 4);
+    analogWrite(RGB_G, g * 4);
+    analogWrite(RGB_B, b * 4);
 }
 
 void Engine::calibrateStick(void)

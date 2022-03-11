@@ -1,9 +1,10 @@
 #include <Arduino.h>
+#include <stdio.h>
+
 #include <GFXcanvas16Opt.h> // canvas layer
 #include <tetris_core.h>
-#include "sprites.h"
-#include <stdio.h>
-#include "engine_core.h"
+#include <sprites.h>
+#include <engine_core.h>
 
 #define STAGE_TITLE_SCREEN 0
 #define STAGE_INGAME 1
@@ -15,14 +16,10 @@
 
 Engine *engine;
 GFXcanvas16Opt *canvas = new GFXcanvas16Opt(128, 128);
-TetrisCore *core = new TetrisCore();
+TetrisCore *tetrisCore = new TetrisCore();
 
 uint lastMillisMovePiece, lastMillisTitleScreen;
 bool titleScreenOn = true;
-int16_t sx = 0;
-int16_t sy = 0;
-int16_t sw = 128;
-int16_t sh = 128;
 uint millisToMovePiece = 500;
 uint millisToTitleScreen = 700;
 int currentStage = STAGE_TITLE_SCREEN;
@@ -34,14 +31,14 @@ void setup()
   engine = new Engine();
 
   // game
-  core->reset();
+  tetrisCore->reset();
   lastMillisMovePiece = millis();
   lastMillisTitleScreen = millis();
 }
 
 void input_gyro(void)
 {
-  gyro_state state = engine->input_gyro();
+  //gyro_state state = engine->input_gyro();
 }
 
 void input_joy(void)
@@ -52,27 +49,27 @@ void input_joy(void)
   if (currentStage == STAGE_INGAME)
   {
     if (joy.x >= 1000)
-      core->movePiece(1);
+      tetrisCore->movePiece(1);
     if (joy.x <= 24)
-      core->movePiece(0);
+      tetrisCore->movePiece(0);
     if (joy.y >= 1000)
-      core->movePiece(2);
+      tetrisCore->movePiece(2);
   }
   
   if (joy.b1)
   {
     if (currentStage == STAGE_INGAME)
     {
-      core->rotatePiece(2);
+      tetrisCore->rotatePiece(2);
     }
     if (currentStage == STAGE_GAMEOVER)
     {
-      core->reset();
+      tetrisCore->reset();
       currentStage = STAGE_INGAME;
     }
     if (currentStage == STAGE_TITLE_SCREEN)
     {
-      core->reset();
+      tetrisCore->reset();
       currentStage = STAGE_INGAME;
       engine->rgb(0, 0, 0);
     }
@@ -86,12 +83,12 @@ void input_joy(void)
     }
     if (currentStage == STAGE_GAMEOVER)
     {
-      core->reset();
+      tetrisCore->reset();
       currentStage = STAGE_INGAME;
     }
     if (currentStage == STAGE_TITLE_SCREEN)
     {
-      core->reset();
+      tetrisCore->reset();
       currentStage = STAGE_INGAME;
       engine->rgb(0, 0, 0);
     }
@@ -100,7 +97,7 @@ void input_joy(void)
 
 void inputs(void)
 {
-  //input_gyro();
+  input_gyro();
   input_joy();
 }
 
@@ -113,7 +110,7 @@ void gameCore(void)
     lastMillisTitleScreen = millis();
     titleScreenOn = !titleScreenOn;
     if (titleScreenOn)
-      engine->rgb(0, 0, 1024);
+      engine->rgb(0, 0, 255);
     else
       engine->rgb(0, 0, 0);
   }
@@ -126,9 +123,9 @@ void gameCore(void)
 
     lastMillisMovePiece = millis();
 
-    core->movePiece(2); // down
+    tetrisCore->movePiece(2); // down
 
-    if (core->isGameOver())
+    if (tetrisCore->isGameOver())
     {
       currentStage = STAGE_GAMEOVER;
     }
@@ -153,12 +150,12 @@ void draw(void)
     // sprites
     for (int i = 0; i < BOARD_WIDTH; i++)
       for (int j = 0; j < (BOARD_HEIGHT - 1); j++)
-        if (core->hasBlock(i, j))
+        if (tetrisCore->hasBlock(i, j))
           canvas->drawRGBBitmap(i * 8, j * 8, block_still, 8, 8);
 
     if (currentStage == STAGE_INGAME)
     {
-      Piece currentPiece = core->getCurrentPiece();
+      Piece currentPiece = tetrisCore->getCurrentPiece();
       for (int i = 0; i < BLOCKS_PER_PIECE; i++)
         canvas->drawRGBBitmap(
             (currentPiece.x + currentPiece.blocks[i].x) * 8,
@@ -169,7 +166,7 @@ void draw(void)
     // fonts
     canvas->print(2, 2, (char *)"Score", MAGENTA);
     char score_value[7];
-    snprintf(score_value, sizeof(score_value), "%06d", core->getScore());
+    snprintf(score_value, sizeof(score_value), "%06d", tetrisCore->getScore());
     canvas->print(78, 2, score_value, MAGENTA);
   }
 
@@ -190,5 +187,5 @@ void loop(void)
   // buffer to screen
   engine->draw(canvas->getBuffer());
 
-  engine->getFps();
+  engine->loop();  
 }
