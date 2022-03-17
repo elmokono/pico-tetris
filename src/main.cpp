@@ -38,24 +38,32 @@ void setup()
 
 void input_gyro(void)
 {
-  //gyro_state state = engine->input_gyro();
+  // gyro_state state = engine->input_gyro();
 }
 
 void input_joy(void)
 {
   joystick_state joy = engine->input_joy();
 
+  if (joy.novalue)
+    return;
+
+  if (currentStage == STAGE_TITLE_SCREEN)
+  {
+    engine->calibrateStick();
+  }
+
   // control tetris
   if (currentStage == STAGE_INGAME)
   {
-    if (joy.x >= 1000)
-      tetrisCore->movePiece(1);
-    if (joy.x <= 24)
+    if (joy.x >= 0.8)
       tetrisCore->movePiece(0);
-    if (joy.y >= 1000)
-      tetrisCore->movePiece(2);
+    else if (joy.x <= -0.8)
+      tetrisCore->movePiece(1);
+    // else if (joy.y >= 0.8)
+    //   tetrisCore->movePiece(2);
   }
-  
+
   if (joy.b1)
   {
     if (currentStage == STAGE_INGAME)
@@ -75,12 +83,16 @@ void input_joy(void)
     }
   }
 
-  if (joy.b2)
+  if (joy.b2down)
   {
     if (currentStage == STAGE_INGAME)
     {
-      // ideas?
+      tetrisCore->movePiece(2);
     }
+  }
+
+  if (joy.b2)
+  {
     if (currentStage == STAGE_GAMEOVER)
     {
       tetrisCore->reset();
@@ -140,6 +152,22 @@ void draw(void)
 
     if (titleScreenOn)
       canvas->print(4, 96, (char *)PRESS_ANY_KEY, MAGENTA);
+
+    joystick_state joy = engine->input_joy();
+    /*
+        if (joy.x != -1)
+        {
+          Serial.print("x: ");
+          Serial.print(joy.x);
+          Serial.print(" y: ");
+          Serial.println(joy.y);
+
+          char score_value[7];
+          snprintf(score_value, sizeof(score_value), "%u", joy.x);
+          canvas->print(2, 2, score_value, MAGENTA);
+          snprintf(score_value, sizeof(score_value), "%u", joy.y);
+          canvas->print(2, 16, score_value, MAGENTA);
+        }*/
   }
 
   if (currentStage == STAGE_INGAME || currentStage == STAGE_GAMEOVER)
@@ -187,5 +215,5 @@ void loop(void)
   // buffer to screen
   engine->draw(canvas->getBuffer());
 
-  engine->loop();  
+  engine->loop();
 }

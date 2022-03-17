@@ -8,6 +8,17 @@
 
 #include "engine_core.h"
 
+Adafruit_MPU6050 mpu;
+Adafruit_ST7735 *tft = new Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
+uint lastMillis, lastMillisJoy;
+bool button1Pressed = false, button2Pressed = false, button3Pressed = false;
+uint millisToJoy = 100;
+short intFps = 0;
+
+float xCenterAvg = 0;
+float yCenterAvg = 0;
+long calibrateSamples = 0;
+
 Engine::Engine()
 {
     tft->initR(INITR_144GREENTAB);
@@ -22,7 +33,10 @@ Engine::Engine()
     lastMillis = millis();
 
     // joy
-    calibrateStick();
+    pinMode(JOY_BT, INPUT_PULLUP);
+    pinMode(JOY_B1, INPUT_PULLUP);
+    pinMode(JOY_B2, INPUT_PULLUP);
+    pinMode(JOY_B3, INPUT_PULLUP);
     lastMillisJoy = millis();
 
     setup_gyro();
@@ -38,8 +52,9 @@ joystick_state Engine::input_joy(void)
     joystick_state joy;
 
     joy.b1 = joy.b2 = joy.b3 = joy.b1down = joy.b2down = joy.b3down = false;
-    joy.x = stickXCenter;
-    joy.y = stickYCenter;
+    joy.x = 0;
+    joy.y = 0;
+    joy.novalue = true;
 
     if (millis() - lastMillisJoy < millisToJoy)
         return joy;
@@ -47,27 +62,42 @@ joystick_state Engine::input_joy(void)
     lastMillisJoy = millis();
 
     // 0-stickXCenter-1023
-    joy.x = analogRead(JOY_AX);
-    joy.y = analogRead(JOY_AY);
 
-    if (digitalRead(JOY_B3) == HIGH && button3Pressed)
+    // 368
+
+    // converts to -1/0/+1
+    int x = analogRead(JOY_AX);
+    joy.x = x > stickXCenter ? (x - stickXCenter) / (STICK_MAX - stickXCenter) : ((x - stickXCenter) / (stickXCenter - STICK_MIN));
+    int y = analogRead(JOY_AY);
+    joy.y = y > stickYCenter ? (y - stickYCenter) / (STICK_MAX - stickYCenter) : ((y - stickYCenter) / (stickYCenter - STICK_MIN));
+
+    PinStatus b1Down = digitalRead(JOY_B1);
+    PinStatus b2Down = digitalRead(JOY_B2);
+    PinStatus b3Down = digitalRead(JOY_B3);
+
+    if (b3Down == HIGH && button3Pressed)
         button3Pressed = false;
-    else if (digitalRead(JOY_B3) == LOW && !button3Pressed)
+    else if (b3Down == LOW && !button3Pressed)
         joy.b3 = button3Pressed = true;
 
-    if (digitalRead(JOY_B2) == HIGH && button2Pressed)
+    if (b2Down == HIGH && button2Pressed)
         button2Pressed = false;
-    else if (digitalRead(JOY_B2) == LOW && !button2Pressed)
+    else if (b2Down == LOW && !button2Pressed)
         joy.b2 = button2Pressed = true;
 
-    if (digitalRead(JOY_B1) == HIGH && button1Pressed)
+    if (b1Down == HIGH && button1Pressed)
         button1Pressed = false;
-    else if (digitalRead(JOY_B1) == LOW && !button1Pressed)
+    else if (b1Down == LOW && !button1Pressed)
         joy.b1 = button1Pressed = true;
 
-    joy.b1down = button1Pressed;
-    joy.b2down = button2Pressed;
-    joy.b3down = button3Pressed;
+    joy.b1pressed = button1Pressed;
+    joy.b2pressed = button2Pressed;
+    joy.b3pressed = button3Pressed;
+    joy.b1down = b1Down == LOW;
+    joy.b2down = b2Down == LOW;
+    joy.b3down = b3Down == LOW;
+    joy.b1down = 
+    joy.novalue = false;
 
     return joy;
 }
@@ -209,20 +239,13 @@ void Engine::rgb(short r, short g, short b)
 
 void Engine::calibrateStick(void)
 {
-    pinMode(JOY_BT, INPUT_PULLUP);
-    pinMode(JOY_B1, INPUT_PULLUP);
-    pinMode(JOY_B2, INPUT_PULLUP);
+    int ax = analogRead(JOY_AX);
+    int ay = analogRead(JOY_AY);
 
-    float xCenterAvg = 0;
-    float yCenterAvg = 0;
-    int samples = 0;
-    while (millis() - lastMillis < 500)
-    {
-        xCenterAvg += analogRead(JOY_AX);
-        yCenterAvg += analogRead(JOY_AY);
-        samples++;
-    }
+    xCenterAvg += ax;
+    yCenterAvg += ay;
 
-    stickXCenter = (xCenterAvg / samples);
-    stickYCenter = (yCenterAvg / samples);
+    calibrateSamples++;
+    stickXCenter = xCenterAvg / calibrateSamples;
+    stickYCenter = yCenterAvg / calibrateSamples;
 }

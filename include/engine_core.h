@@ -25,18 +25,23 @@
 #define RGB_G 18
 #define RGB_B 19
 
-#define STICK_CENTER 512
+#define STICK_MIN 0.0
+#define STICK_MAX 1023.0
 
 struct joystick_state
 {
-  int16_t x;
-  int16_t y;
+  float x;
+  float y;
+  bool novalue;
   bool b1;
   bool b2;
   bool b3;
   bool b1down;
   bool b2down;
   bool b3down;
+  bool b1pressed;
+  bool b2pressed;
+  bool b3pressed;
 };
 
 struct gyro_state
@@ -60,16 +65,9 @@ public:
     joystick_state input_joy(void);
     void loop(void);
     void draw(uint16_t* buffer);
+    float stickXCenter = 512; float stickYCenter = 512;// default ideal value
     short fps;
 
 private:
-    Adafruit_MPU6050 mpu;  
-    Adafruit_ST7735 *tft = new Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);  
-    uint lastMillis, lastMillisJoy;
-    bool button1Pressed = false, button2Pressed = false, button3Pressed = false;    
-    uint millisToJoy = 100;
-    short intFps = 0;
-    float stickXCenter = 512; float stickYCenter = 512;// default ideal value
-    void setup_gyro(void);
-    
+    void setup_gyro(void);    
 };
