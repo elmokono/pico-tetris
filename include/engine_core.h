@@ -6,6 +6,15 @@
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
 
+/*
+pico spi0 pins
+---------------------------
+#define PIN_SPI_MISO  (16u)
+#define PIN_SPI_MOSI  (19u)
+#define PIN_SPI_SCK   (18u)
+#define PIN_SPI_SS    (17u)
+*/
+
 #define TFT_DC 21
 #define TFT_CS 17
 #define TFT_RST 20
@@ -14,16 +23,13 @@
 #define JOY_AY 27
 #define JOY_BT 22
 
-//#define GYRO_SDA 6
-//#define GYRO_SCL 7
-
 #define JOY_B1 8
 #define JOY_B2 9
 #define JOY_B3 10
 
-#define RGB_R 16
-#define RGB_G 18
-#define RGB_B 19
+#define RGB_R 2
+#define RGB_G 3
+#define RGB_B 4
 
 #define STICK_MIN 0.0
 #define STICK_MAX 1023.0
@@ -44,30 +50,15 @@ struct joystick_state
   bool b3pressed;
 };
 
-struct gyro_state
-{
-  float acc_x;
-  float acc_y;
-  float acc_z;
-  float gyr_x;
-  float gyr_y;
-  float gyr_z;
-  float temp;
-};
-
 class Engine
 {
 public:
     Engine();
     void calibrateStick(void);
     void rgb(short r, short g, short b);
-    gyro_state input_gyro(void);
     joystick_state input_joy(void);
     void loop(void);
     void draw(uint16_t* buffer);
     float stickXCenter = 512; float stickYCenter = 512;// default ideal value
     short fps;
-
-private:
-    void setup_gyro(void);    
 };
